@@ -1,6 +1,9 @@
 package com.example.galaxyproyecto.controller;
 
 import com.example.galaxyproyecto.model.Course;
+import com.example.galaxyproyecto.model.Teacher;
+import com.example.galaxyproyecto.model.modelassembler.CourseModelAssembler;
+import com.example.galaxyproyecto.model.modelassembler.TeacherModelAssembler;
 import com.example.galaxyproyecto.service.ICourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -8,6 +11,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,14 +28,18 @@ public class CourseController {
     @Autowired
     private ICourseService courseService;
 
+    @Autowired
+    CourseModelAssembler courseModelAssembler;
     @GetMapping("/find-all")
-    public List<Course> findAll() {
-        return courseService.findAll();
+    public CollectionModel<EntityModel<Course>> findAll() {
+        List<Course> courses= courseService.findAll();
+        return courseModelAssembler.toCollectionModel(courses);
     }
 
     @GetMapping(path= "/{id}",produces= {MediaType.APPLICATION_JSON_VALUE})
-    public Course findById(@PathVariable("id") Integer id) {
-        return courseService.findById(id).orElse(null);
+    public  EntityModel<Course> findById(@PathVariable("id") Integer id) {
+        Course course=courseService.findById(id).orElse(null);
+        return  courseModelAssembler.toModel(course);
     }
 
     @GetMapping("/by-nombre")

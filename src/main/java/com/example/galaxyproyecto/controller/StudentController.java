@@ -1,12 +1,18 @@
 package com.example.galaxyproyecto.controller;
 
+import com.example.galaxyproyecto.model.Course;
 import com.example.galaxyproyecto.model.Student;
+import com.example.galaxyproyecto.model.Teacher;
+import com.example.galaxyproyecto.model.modelassembler.StudentModelAssembler;
+import com.example.galaxyproyecto.model.modelassembler.TeacherModelAssembler;
 import com.example.galaxyproyecto.service.IStudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,16 +32,21 @@ public class StudentController {
     @Autowired
     private IStudentService studentService;
    // @CrossOrigin(origins = "http://localhost:8080")
+
+    @Autowired
+    StudentModelAssembler studentModelAssembler;
     @GetMapping("/find-all")
-    public List<Student> findAll() {
-        return studentService.findAll();
+    public CollectionModel<EntityModel<Student>>  findAll() {
+        List<Student> students= studentService.findAll();
+        return studentModelAssembler.toCollectionModel(students);
     }
 
     @GetMapping(path= "/{id}",produces= {MediaType.APPLICATION_JSON_VALUE})
-    public Student findById(@PathVariable("id") Integer id) {
-        return studentService.findById(id).orElse(null);
-    }
+    public EntityModel<Student> findById(@PathVariable("id") Integer id) {
+        Student student =studentService.findById(id).orElse(null);
+        return  studentModelAssembler.toModel(student);
 
+    }
     @GetMapping("/by-nombre")
     public List<Student> findByLikeName(@RequestParam(name="name",defaultValue="") String name) {
         return studentService.findByLikeName(Student.builder().name(name).build());

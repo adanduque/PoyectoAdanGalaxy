@@ -38,7 +38,6 @@ public class TeacherController {
     public CollectionModel<EntityModel<Teacher>> findAll() {
      //   return teacherService.findAll();
         List<Teacher> teachers= teacherService.findAll();
-
         return teacherModelAssembler.toCollectionModel(teachers);
     }
 
